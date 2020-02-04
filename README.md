@@ -8,8 +8,8 @@ My final model consisted of a weighted ensemble of bidirectional LSTM models and
 
 In order to be able to train such heavy models like BERT and GPT2 with only the computational
 resources from Kaggle Kernels (9-hour GPU with 16GB RAM), I had to apply techniques such as
-Gradient Accumulation and Mixed-Precision Training. Other ML techniques applied in
-the models were: Multi-Task Learning and Checkpoint Ensemble.
+**Gradient Accumulation** and **Mixed-Precision Training**. Other ML techniques applied in
+the models were: **Multi-Task Learning** and **Checkpoint Ensemble**.
   
 The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM model, and the inference notebook of the ensemble that was submitted as a final solution are included in this repository.  
 
