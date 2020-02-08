@@ -62,7 +62,7 @@ This gave all my models a nice boost, since they were now paying less attention 
 Since this tweak wasn’t publicly shared during the competition, it gave an edge to my models. When the competition ended, and a lot of solutions were published, I found out that only one other participant had come up with something similar.
 ```python
 train_df['ta_count'] = train_df['toxicity_annotator_count'] / train_df['toxicity_annotator_count'].mean()
-sample_weights *= train_df['ta_count_coef']
+sample_weights *= train_df['ta_count']
 ```
 
 ### Ensemble
