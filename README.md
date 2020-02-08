@@ -13,7 +13,7 @@ the models were: **Multi-Task Learning** and **Checkpoint Ensemble**.
   
 The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM model, and the inference notebook of the ensemble that was submitted as a final solution are included in this repository.  
 
-![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM1-jigsaw.png) 
+![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png) 
 
 Kaggle Profile: https://www.kaggle.com/andrewparr
 
