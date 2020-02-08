@@ -50,7 +50,7 @@ sample_weights += (~train_df[TARGET_COLUMN]) * train_df[IDENTITY_COLUMNS].sum(ax
 ```
 
 #### Multi-Task Learning
-Training the network with auxiliary targets (from additional info found in the train samples) also proved to be very effective. The network learns to predict these other targets (I used up to 5 **auxiliary targets**: *'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat'*) and how the presence of these can translate into the main target *'toxicity'*, thus helping it make more accurate predictions.
+Training the network with auxiliary targets (from additional info found in the train samples) also proved to be very effective. The network learns to predict these other targets (I used up to 5 **Auxiliary Targets**: *'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat'*) and how the presence of these can translate into the main target *'toxicity'*, thus helping it make more accurate predictions.
 ```python
 Y_COLUMNS = ['target', 'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat']
 ```
@@ -68,7 +68,7 @@ sample_weights *= train_df['ta_count']
 
 ### Ensembling
 
-With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunings of state-of-the-art NLP models such as BERT or GPT2 (***Transfer Learning***). LSTM architectures were outperformed by these models but they were ensembling very well with them.
+With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunings of state-of-the-art NLP models such as BERT or GPT2 (**Transfer Learning**). LSTM architectures were outperformed by these models but they were ensembling very well with them.
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
