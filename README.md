@@ -68,7 +68,7 @@ sample_weights *= train_df['ta_count']
 
 ### Ensemble
 
-With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunnings of state-of-the-art NLP models such as BERT or GPT2 (***Transfer Learning***). LSTM architectures were outperformed by these models but they were ensembling very well with them.
+With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunings of state-of-the-art NLP models such as BERT or GPT2 (***Transfer Learning***). LSTM architectures were outperformed by these models but they were ensembling very well with them.
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
