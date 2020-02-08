@@ -66,7 +66,7 @@ train_df['ta_count'] = train_df['toxicity_annotator_count'] / train_df['toxicity
 sample_weights *= train_df['ta_count']
 ```
 
-### Ensemble
+### Ensembling
 
 With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunings of state-of-the-art NLP models such as BERT or GPT2 (***Transfer Learning***). LSTM architectures were outperformed by these models but they were ensembling very well with them.
 
@@ -75,6 +75,8 @@ Thus, the task at hand was to create a variety of models from these architecture
 ### Submission Constraints
 
 The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a maximum of 20GB of database storage (each trained model used for inference was uploaded as a database). Balancing these constraints while at the same time considering how much stronger each particular model is expected to make the ensemble was a complex task. 
+
+Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4/n=5, to the point that when n=10, they were giving a similar performance. Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
 
 architecture|n models|prepr. time|infer. time|total time|model size|total size
 :---:|:---:|---:|---:|---:|---:|---:
