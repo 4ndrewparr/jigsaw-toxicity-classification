@@ -39,7 +39,7 @@ Consequently, a customized metric was defined to rank the models of this competi
 Being the official metric too computationally expensive to use directly as loss function, designing an efficient loss that still focuses on minimizing identity bias was critical in this competition.
 
 #### Weighted BCE
-The most common approach (and the one I took) was to use some kind of *weighted Binary Cross Entropy*, with somehow larger weigths on samples that mention the identities. After some hyperparameter tuning, I ended up using the following formula:
+The most common approach (and the one I took) was to use some kind of *weighted Binary Cross Entropy*, with somehow larger weights on samples that mention the identities. After some hyperparameter tuning, I ended up using the following formula:
 
 ```python
 sample_weights = np.ones(len(train_df), dtype=np.float32)
@@ -49,7 +49,7 @@ sample_weights += (~train_df[TARGET_COLUMN]) * train_df[IDENTITY_COLUMNS].sum(ax
 ```
 
 #### Multi-Task Learning
-Training the network with auxiliar targets (from additional info found in the train samples) also proved to be very effective. The network learns to predict these other targets (I used up to 5 **auxiliar targets**: *'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat'*) and how the presence of these can translate into the main target *'toxicity'*, thus helping it make more accurate predictions.
+Training the network with auxiliary targets (from additional info found in the train samples) also proved to be very effective. The network learns to predict these other targets (I used up to 5 **auxiliary targets**: *'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat'*) and how the presence of these can translate into the main target *'toxicity'*, thus helping it make more accurate predictions.
 ```python
 Y_COLUMNS = ['target', 'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat']
 ```
@@ -57,10 +57,9 @@ Y_COLUMNS = ['target', 'severe_toxicity', 'obscene', 'identity_attack', 'insult'
 #### Confidence Score
 One of my original contributions in the competition was to further modify the weights to reflect the 'confidence' in the labeling. 
 The samples had been manually labeled and one of the features in the train dataset was *'toxicity_annotator_count'*, specifying the number of times that a sample had been labeled (the final labels were just an average of these individual annotations).
-After observing that my models' biggest mistakes (*error = prediction - target*) were happening on misslabeled samples with the minimum annotator count I decided to modify the weights accordingly.
-This gave all my models a nice boost, since they were now paying less attention to noisy, missleading samples.
-Since this tweak wasnt publicly shared during the competition, it gave an edge to my models. When the competition ended and a lot of solutions were published I found out only one other participant had came up with something similar.
-
+After observing that my models' biggest mistakes (*error = prediction - target*) were happening on mislabelled samples with the minimum annotator count I decided to modify the weights accordingly.
+This gave all my models a nice boost, since they were now paying less attention to noisy, misleading samples.
+Since this tweak wasn’t publicly shared during the competition, it gave an edge to my models. When the competition ended, and a lot of solutions were published, I found out that only one other participant had come up with something similar.
 ```python
 train_df['ta_count'] = train_df['toxicity_annotator_count'] / train_df['toxicity_annotator_count'].mean()
 sample_weights *= train_df['ta_count_coef']
@@ -70,18 +69,17 @@ sample_weights *= train_df['ta_count_coef']
 
 With external sources allowed in the competition, it became soon obvious that the winning solutions were going to be ensembles including fine-tunnings of state-of-the-art NLP models such as BERT or GPT2 (***Transfer Learning***). LSTM architectures were outperformed by these models but they were ensembling very well with them.
 
-Thus the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
+Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
 ### Submission Constraints
 
-The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a limited databases storage (20GB). Balancing these constraints while at the same time considering how much stronger each particular model is expected to make the ensemble was a complex task.
+The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a maximum of 20GB of database storage (each trained model used for inference was uploaded as a database). Balancing these constraints while at the same time considering how much stronger each particular model is expected to make the ensemble was a complex task. 
 
 My submission ensemble included:
 - 5 BERT models
 -	3 GPT2 models
 -	6 LSTM1 models
 -	5 LSTM2 models
-
 
 
 
