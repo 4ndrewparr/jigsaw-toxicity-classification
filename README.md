@@ -24,7 +24,7 @@ The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM 
 
 The focus of this competition was on minimizing the bias that toxicity models (with ***toxicity*** defined as: *anything rude, disrespectful or otherwise likely to make someone leave a discussion*) usually account for. These models tend to learn incorrectly to associate the presence of frequently attacked identities like *gay* or *black* to toxicity, even in non-toxic contexts.
 
-Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs, as explained [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
+Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs, as explained in detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
 
 <p align="center">
   <img src="https://latex.codecogs.com/svg.latex?score%20=%20w_0%20AUC_{overall}%20+%20\sum_{i=1}^{3}%20w_i%20AUC_{bias_{i}}">
@@ -72,11 +72,26 @@ With external sources allowed in the competition, it became soon obvious that th
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
+Seeking model diversity, I worked on two variants of the general LSTM architecture shown in the diagram, LSTM1 and LSTM2. The main differences between these two, besides one being written in Keras and the other in PyTorch (and using some Fast AI libraries), are:
+- A different *Text Preprocessing*  
+
+- *Spatial Dropout* of 0.2 for LSTM1, 0.3 for LSTM2
+- *Toxicity Target* kept as a *continuous* variable in LSTM1, while converted to *binary* (0,1 values) in LSTM2
+- 5 *Auxiliary Targets* in LSTM1, but 6 in LSTM2 (toxicity target is also included as aux. target)
+- An slightly different *Loss Function* (different weights algorithm)
+- *Sequence Bucketing* applied in LSTM2
+
+
+
 ### Submission Constraints
 
 The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a maximum of 20GB of database storage (each trained model used for inference was uploaded as a database). Balancing these constraints while at the same time considering how much stronger each particular model is expected to make the ensemble was a complex task. 
 
-Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4/n=5, to the point that when n=10, they were giving a similar performance. Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
+Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4/n=5, to the point that when n=10, they were giving a similar performance.
+
+
+
+Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
 
 architecture|n models|prepr. time|infer. time|total time|model size|total size
 :---:|:---:|---:|---:|---:|---:|---:
