@@ -24,7 +24,7 @@ The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM 
 
 The focus of this competition was on minimizing the bias that toxicity models (with ***toxicity*** defined as: *anything rude, disrespectful or otherwise likely to make someone leave a discussion*) usually account for. These models tend to learn incorrectly to associate the presence of frequently attacked identities like *gay* or *black* to toxicity, even in non-toxic contexts.
 
-Consequently, a customized metric was defined to rank the models of this competition. Basically, to the overall AUC they added three bias-focused AUCs, as explained [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation), to compute the score. It can be written like this:
+Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs, as explained [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
 
 <p align="center">
   <img src="https://latex.codecogs.com/svg.latex?score%20=%20w_0%20AUC_{overall}%20+%20\sum_{i=1}^{3}%20w_i%20AUC_{bias_{i}}">
