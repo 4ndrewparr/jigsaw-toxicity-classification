@@ -94,7 +94,6 @@ This simple technique allows to emulate training with larger batch when the memo
 For example, if we would like to use a batch size of 64, but dont have enough RAM for it (OOM error), we can calculate the gradients with the smaller batch size that the memory can handle (32 in this case), but dont do the optimizer step or zero grad until we go through another batch. Since the gradients keep accumulating until we zerograd them, we will be effectively using a 64 batch size, without the need to keep in memory the whole batch.
 ```python
 ACCUMULATION_STEPS = 2
-...
 for i in batches:
   ...
   loss.backward() # calculate gradients
