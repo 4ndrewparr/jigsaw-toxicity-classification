@@ -108,7 +108,7 @@ for i in batches:
 
 Mixed precision training offers significant computational speedup by performing operations in half-precision (16-bit) format, while storing minimal information in single-precision (32-bit) to retain as much information as possible in critical parts of the network.
 
-I used the library ```apex.amp``` (AMP: Automatic Mixed Precision) to apply mixed precision while training BERT and GPT2, reducing memory usage and increasing speed.
+I used the library ```apex.amp``` (AMP: *Automatic Mixed Precision*) to apply mixed precision while training BERT and GPT2, reducing memory usage and increasing speed.
 
 ```python
 # Declare model and optimizer as usual, with default (FP32) precision
