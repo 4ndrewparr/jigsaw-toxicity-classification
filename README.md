@@ -95,12 +95,14 @@ For example, if we would like to use a batch size of 64, but dont have enough RA
 ```python
 ACCUMULATION_STEPS = 2
 ...
-loss.backward()
-...
-if (i+1) % ACCUMULATION_STEPS == 0:
-            optimizer.step()
-            optimizer.zero_grad()
-```
+for i in batches:
+  ...
+  loss.backward() # calculate gradients
+  ...
+  if (i+1) % ACCUMULATION_STEPS == 0:
+              optimizer.step()
+              optimizer.zero_grad()
+  ```
 
 
 #### Mixed-Precision Training
