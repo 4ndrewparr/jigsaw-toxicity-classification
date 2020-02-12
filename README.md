@@ -87,11 +87,11 @@ Seeking model diversity, I worked on two variants of the general LSTM architectu
 
 At inference time, LSTM loaded models (which include the embedding matrices) will be tested with a new dataset. What do we do with the embedding matrix? We have different options:
 
-####The Good Solution
+#### The Good Solution
 
 We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways.
 
-####The Better Solution
+#### The Better Solution
 
 The more words with embeddings, the more info we are feeding to the model, this is why rebuilding the embedding matrix with the words from the test set is the optimal solution.
 
@@ -117,7 +117,7 @@ model = load_model(os.path.join(model_path, checkpoint))
 model.layers[1].set_weights([embedding_matrix_new])
 ```
 
-This emb matrix will have embeddings for every word in the test set, and the model's accuracy should benefit from this!
+This embedding matrix will have embeddings for every word in the test set, and the model's accuracy should benefit from this!
 
 
 
@@ -143,6 +143,8 @@ LSTM1|6|10"|25"|160"|0.77GB|4.62GB
 LSTM2|5|35"|20"|135"|0.97GB|4.85GB
 TOTAL|19|||6,485"||19.89GB
 **MAX**||||**7,200"**||**20.00GB**
+
+
 
 
 Kaggle Profile: https://www.kaggle.com/andrewparr
