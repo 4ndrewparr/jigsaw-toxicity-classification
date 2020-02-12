@@ -15,7 +15,6 @@ the models were: **Multi-Task Learning** and **Checkpoint Ensemble**.
   
 The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM model, and the inference notebook of the ensemble that was submitted as a final solution are included in this repository.  
 
-![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png) 
 
 
 ## Keys of the Competition
@@ -74,6 +73,8 @@ With external sources allowed in the competition, it became soon obvious that th
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
+![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png) 
+
 Seeking model diversity, I worked on two variants of the general LSTM architecture shown in the diagram, LSTM1 and LSTM2. The main differences between these two, besides one being written in Keras and the other in PyTorch (and using some Fast AI libraries), are:
 - A different *Text Preprocessing*  
 
@@ -83,13 +84,63 @@ Seeking model diversity, I worked on two variants of the general LSTM architectu
 - An slightly different *Loss Function* (different weights algorithm)
 - *Sequence Bucketing* applied in LSTM2
 
+### Efficient Training
+
+In order to be able to train such heavy models like BERT and GPT2 with only the computational resources from Kaggle Kernels (9-hour GPU with 16GB RAM), I had to apply techniques such as:
+
+#### Gradient Accumulation
+
+This simple technique allows to emulate training with larger batch when the memory doesnt allow it directly.
+For example, if we would like to use a batch size of 64, but dont have enough RAM for it (OOM error), we can calculate the gradients with the smaller batch size that the memory can handle (32 in this case), but dont do the optimizer step or zero grad until we go through another batch. Since the gradients keep accumulating until we zerograd them, we will be effectively using a 64 batch size, without the need to keep in memory the whole batch.
+```python
+ACCUMULATION_STEPS = 2
+...
+loss.backward()
+...
+if (i+1) % ACCUMULATION_STEPS == 0:
+            optimizer.step()
+            optimizer.zero_grad()
+```
+
+
+#### Mixed-Precision Training
+
+Mixed precision training offers significant computational speedup by performing operations in half-precision (16-bit) format, while storing minimal information in single-precision (32-bit) to retain as much information as possible in critical parts of the network.
+
+I used the library ```apex.amp``` (AMP: Automatic Mixed Precision) to apply mixed precision while training BERT and GPT2, reducing memory usage and increasing speed.
+
+```python
+# Declare model and optimizer as usual, with default (FP32) precision
+model = torch.nn.Linear(D_in, D_out).cuda()
+optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
+
+# Allow Amp to perform casts as required by the opt_level
+model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
+...
+# loss.backward() becomes:
+with amp.scale_loss(loss, optimizer) as scaled_loss:
+    scaled_loss.backward()
+...
+```
+
+#### Sequence Bucketing
+
+When feeding the texts to the model, if we sort the text sequences by length, each batch contains now sequences of the same or very similar length, and this translates into a much smaller on average tensor (since we can use a smaller max sequence length) being fed into the model than the one that would be fed without sorting (which includes a lot of padding zeros for sequences that are shorter than the max sequence length in the batch).
+
+Needless to say, this reduction of the average size of the tensor translates into faster computations both during training and inference. But during training, feeding the train set ordered by sequence length would create fitting problems. That is why several buckets of samples are created and only within these buckets the samples are sorted. This way there is sequence trimming optimization, but the model is still being trained with relatively alternating sequence lengths.
+
+This technique, while very practical at training time, was critical during inference, when every small time usage improvement could allow you to squezee another model in the submission kernel making your ensemble stronger.
+
+
+
+
 ### Rebuilding the Embedding Matrix
 
 At inference time, LSTM loaded models (which include the embedding matrices) will be tested with a new dataset. What do we do with the embedding matrix? We have different options:
 
 #### The Good Solution
 
-We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways.
+We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways. The advantage of this solution is that not having to rebuild the matrices saves some time, which is critical in the submission kernel.
 
 #### The Better Solution
 
@@ -133,7 +184,7 @@ Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4
 <p align="center">
  
 
-Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants (rebuilding the embedding matrix adds ~ 30" to the preprocessing LSTMs preprocessing times shown).
+Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
 
 architecture|n models|prepr. time|infer. time|total time|model size|total size
 :---:|:---:|---:|---:|---:|---:|---:
@@ -144,8 +195,10 @@ LSTM2|5|35"|20"|135"|0.97GB|4.85GB
 TOTAL|19|||6,485"||19.89GB
 **MAX**||||**7,200"**||**20.00GB**
 
+Rebuilding the embedding matrix adds ~ 30" to the preprocessing LSTMs preprocessing times shown.
 
 
+### Other Ideas
 
 Kaggle Profile: https://www.kaggle.com/andrewparr
 
