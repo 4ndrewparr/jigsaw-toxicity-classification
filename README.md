@@ -91,7 +91,7 @@ The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a m
 
 Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4/n=5, to the point that when n=10, they were giving a similar performance.
 
-
+![BERT subensemble](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/BERT-subensemble.png) 
 
 Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
 
