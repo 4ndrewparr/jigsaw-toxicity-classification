@@ -40,7 +40,7 @@ Consequently, a customized metric was defined to rank the models of this competi
 Being the official metric too computationally expensive to use directly as loss function, designing an efficient loss that still focuses on minimizing identity bias was critical in this competition.
 
 #### Weighted BCE
-The most common approach (and the one I took) was to use some kind of *weighted Binary Cross Entropy*, with somehow larger weights on samples that mention the identities. After some hyperparameter tuning, I ended up using the following formula:
+The most common approach (and the one I took) was to use some kind of *weighted Binary Cross Entropy*, with somehow larger weights on samples that mention the identities. The algorithm to determine these weights could be tuned as another hyperparameter. This is one of the formulas that I ended up using:
 
 ```python
 sample_weights = np.ones(len(train_df), dtype=np.float32)
@@ -51,6 +51,7 @@ sample_weights += (~train_df[TARGET_COLUMN]) * train_df[IDENTITY_COLUMNS].sum(ax
 
 #### Multi-Task Learning
 Training the network with auxiliary targets (from additional info found in the train samples) also proved to be very effective. The network learns to predict these other targets (I used up to 5 **Auxiliary Targets**: *'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat'*) and how the presence of these can translate into the main target *'toxicity'*, thus helping it make more accurate predictions.
+
 ```python
 Y_COLUMNS = ['target', 'severe_toxicity', 'obscene', 'identity_attack', 'insult', 'threat']
 ```
@@ -61,6 +62,7 @@ The samples had been manually labeled and one of the features in the train datas
 After observing that my models' biggest mistakes (*error = prediction - target*) were happening on mislabelled samples with the minimum annotator count I decided to modify the weights accordingly.
 This gave all my models a nice boost, since they were now paying less attention to noisy, misleading samples.
 Since this tweak wasn’t publicly shared during the competition, it gave an edge to my models. When the competition ended, and a lot of solutions were published, I found out that only one other participant had come up with something similar.
+
 ```python
 train_df['ta_count'] = train_df['toxicity_annotator_count'] / train_df['toxicity_annotator_count'].mean()
 sample_weights *= train_df['ta_count']
