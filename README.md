@@ -73,7 +73,10 @@ With external sources allowed in the competition, it became soon obvious that th
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
-![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png) 
+<p align="center">
+  <img src="https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png" height="1250">
+</p>  
+<p align="center">
 
 Seeking model diversity, I worked on two variants of the general LSTM architecture shown in the diagram, LSTM1 and LSTM2. The main differences between these two, besides one being written in Keras and the other in PyTorch (and using some Fast AI libraries), are:
 - A different *Text Preprocessing*  
