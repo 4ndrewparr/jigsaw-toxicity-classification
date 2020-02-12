@@ -83,6 +83,42 @@ Seeking model diversity, I worked on two variants of the general LSTM architectu
 - An slightly different *Loss Function* (different weights algorithm)
 - *Sequence Bucketing* applied in LSTM2
 
+### Rebuilding the Embedding Matrix
+
+At inference time, LSTM loaded models (which include the embedding matrices) will be tested with a new dataset. What do we do with the embedding matrix? We have different options:
+
+####The Good Solution
+
+We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways.
+
+####The Better Solution
+
+The more words with embeddings, the more info we are feeding to the model, this is why rebuilding the embedding matrix with the words from the test set is the optimal solution.
+
+To do this we need to first build an oversized new embedding matrix filled with zeros when you run out of words (the test set will contain less words that the train set and to be able to swap the old matrix for the new one, they need to have the same size ```(N_EMBS_LSTM, 600)```).
+```python
+def build_matrix_new(word_index, path):
+    embedding_index = load_embeddings_new(path)
+    embedding_matrix = np.zeros((N_EMBS_LSTM, 300))
+    for word, i in word_index.items():
+        try:
+            embedding_matrix[i] = embedding_index[word]
+        except KeyError:
+            pass
+    return embedding_matrix
+    
+emb_matrix_new = np.concatenate(
+    [build_matrix_new(tokenizer.word_index, f) for f in EMBEDDING_FILES], axis=-1)    
+```
+
+And then we will able to swap this matrix for the old one by selecting the embeddings layer and setting the weights (the embeddings):
+```python
+model = load_model(os.path.join(model_path, checkpoint))
+model.layers[1].set_weights([embedding_matrix_new])
+```
+
+This emb matrix will have embeddings for every word in the test set, and the model's accuracy should benefit from this!
+
 
 
 ### Submission Constraints
@@ -91,9 +127,13 @@ The submission kernel had a limited runtime (120'), a limited RAM (13GB) and a m
 
 Subensembles of BERTs, my strongest models, were reaching an elbow at around n=4/n=5, to the point that when n=10, they were giving a similar performance.
 
-![BERT subensemble](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/BERT-subensemble.png) 
+<p align="center">
+  <img src="https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/BERT-subensemble.png" height="400">
+</p>  
+<p align="center">
+ 
 
-Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants.
+Consequently I went for 5 BERT models. This left time to fit at most 4 GPT2 models (the second strongest model), but to avoid getting into runtime trouble I settled for 3 GPT2 models. I filled the rest of the size and time space with subensembles of both LSTM variants (rebuilding the embedding matrix adds ~ 30" to the preprocessing LSTMs preprocessing times shown).
 
 architecture|n models|prepr. time|infer. time|total time|model size|total size
 :---:|:---:|---:|---:|---:|---:|---:
