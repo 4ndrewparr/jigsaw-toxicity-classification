@@ -34,7 +34,7 @@ And each of this Bias AUCs is calculated as the *generalized mean* of the per-id
   <img src="https://latex.codecogs.com/svg.latex?AUC_{bias}%20=%20\left(\frac{1}{N}%20\sum_{id=1}^{N}%20AUC_{bias_{id}}^p\right)^\frac{1}{p}">
 </p>  
 
-The evaluation metric is explained in detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
+The evaluation metric is explained in more detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
 
 
 ### The Loss Function
