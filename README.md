@@ -22,8 +22,9 @@ The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM 
 
 The focus of this competition was on minimizing the bias that toxicity models (with ***toxicity*** defined as: *anything rude, disrespectful or otherwise likely to make someone leave a discussion*) usually account for. These models tend to learn incorrectly to associate the presence of frequently attacked identities like *gay* or *black* to toxicity, even in non-toxic contexts.
 
-Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs.
-
+Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs.  
+  
+  
 <p align="center">
   <img src="https://latex.codecogs.com/svg.latex?score%20=\frac{%20AUC_{overall}%20+%20AUC_{bias_{1}}+%20AUC_{bias_{2}}+%20AUC_{bias_{3}}}{4}">
 </p>  
@@ -76,10 +77,8 @@ With external sources allowed in the competition, it became soon obvious that th
 
 Thus, the task at hand was to create a variety of models from these architectures and pushing each one as far as possible to make the final ensemble stronger.
 
-<p align="center">
-  <img src="https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png" height="1250">
-</p>  
-<p align="center">
+![Diagram](https://github.com/4ndyparr/jigsaw-toxicity-classification/blob/master/LSTM-jigsaw.png)  
+
 
 Seeking model diversity, I worked on two variants of the general LSTM architecture shown in the diagram, LSTM1 and LSTM2. The main differences between these two, besides one being written in Keras and the other in PyTorch (and using some Fast AI libraries), are:
 - A different *Text Preprocessing*  
@@ -219,7 +218,7 @@ The predictions of a model trained this way are only slightly worse that those o
 
 #### Head+Tail Truncation
 
-The beginning and end of a text used to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, the maximum sequence length.  
+The beginning and end of a text used to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, or the maximum sequence length.  
 
 
 
