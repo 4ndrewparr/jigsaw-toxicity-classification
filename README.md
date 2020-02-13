@@ -22,12 +22,19 @@ The fine-tuning notebooks for BERT and GPT2, the training code of the base LSTM 
 
 The focus of this competition was on minimizing the bias that toxicity models (with ***toxicity*** defined as: *anything rude, disrespectful or otherwise likely to make someone leave a discussion*) usually account for. These models tend to learn incorrectly to associate the presence of frequently attacked identities like *gay* or *black* to toxicity, even in non-toxic contexts.
 
-Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs, as explained in detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
+Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs.
 
 <p align="center">
   <img src="https://latex.codecogs.com/svg.latex?score%20=\frac{%20AUC_{overall}%20+%20AUC_{bias_{1}}+%20AUC_{bias_{2}}+%20AUC_{bias_{3}}}{4}">
 </p>  
 
+And each of this Bias AUCs is calculated as the *generalized mean* of the per-identity equivalent. Critically, the *p* value of this generalized mean is -5, which encourages competitors to improve the model for the identity subgroups with the lowest model performance.
+
+<p align="center">
+  <img src="https://latex.codecogs.com/svg.latex?AUC_{bias}%20=%20\left(\frac{1}{N}%20\sum_{id=1}^{N}%20AUC_{bias_{id}}^p\right)^\frac{1}{p}">
+</p>  
+
+The evaluation metric is explained in detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
 
 
 ### The Loss Function
@@ -113,6 +120,7 @@ I used the library ```apex.amp``` (AMP: *Automatic Mixed Precision*) to apply mi
 # Declare model and optimizer as usual, with default (FP32) precision
 model = BertForSequenceClassification.from_pretrained(WORK_DIR, cache_dir=None, num_labels=len(Y_COLUMNS))
 optimizer = BertAdam(...)
+
 # Allow Amp to perform casts as required by the opt_level
 model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 ...
