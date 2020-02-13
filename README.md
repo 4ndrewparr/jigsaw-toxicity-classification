@@ -1,7 +1,6 @@
 # jigsaw-toxicity-classification [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/4ndyparr/jigsaw-toxicity-classification/master)
 
 
-
 Training and inference code from the models used for the **Kaggle** competition [Jigsaw Unintended Bias in Toxicity Classification](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification). A NLP competition sponsored by the Conversation AI team (founded by Jigsaw and Google) with state-of-the-art winning solutions that apply transfer learning from the most powerful NLP models available at the time. These were: **BERT** (released by Google in October 2018) and **GPT2** (released by Open AI in February 2019).  
   
 My final model consisted of a weighted ensemble of bidirectional LSTM models and BERT and GPT2 pretrained models finetuned with the competition data. It finished in the **top 2%** (56th/2,646) with a Private Leaderboard score of 0.94466 (PL score of the winning model was 0.94734).  
@@ -26,10 +25,7 @@ The focus of this competition was on minimizing the bias that toxicity models (w
 Consequently, a customized metric was defined to rank the models of this competition. Basically, the score is the average of the overall AUC and three bias-focused AUCs, as explained in detail [here](https://www.kaggle.com/c/jigsaw-unintended-bias-in-toxicity-classification/overview/evaluation).  
 
 <p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?score%20=%20w_0%20AUC_{overall}%20+%20\sum_{i=1}^{3}%20w_i%20AUC_{bias_{i}}">
-</p>  
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.latex?w_0,w_1,w_2,w_3}%20=%20{0.25}">
+  <img src="https://latex.codecogs.com/svg.latex?score%20=\frac{%20AUC_{overall}%20+%20AUC_{bias_{1}}+%20AUC_{bias_{2}}+%20AUC_{bias_{3}}}{4}">
 </p>  
 
 
@@ -115,9 +111,8 @@ I used the library ```apex.amp``` (AMP: *Automatic Mixed Precision*) to apply mi
 
 ```python
 # Declare model and optimizer as usual, with default (FP32) precision
-model = torch.nn.Linear(D_in, D_out).cuda()
-optimizer = torch.optim.SGD(model.parameters(), lr=1e-3)
-
+model = BertForSequenceClassification.from_pretrained(WORK_DIR, cache_dir=None, num_labels=len(Y_COLUMNS))
+optimizer = BertAdam(...)
 # Allow Amp to perform casts as required by the opt_level
 model, optimizer = amp.initialize(model, optimizer, opt_level="O1")
 ...
@@ -203,6 +198,22 @@ Rebuilding the embedding matrix adds ~ 30" to the preprocessing LSTMs preprocess
 
 
 ### Other Ideas
+
+Some of the most interesting ideas applied by other participants in this competition:
+
+#### Knowledge Distillation
+
+In this technique, once we have a subensemble of a particular architecture (LSTM, BERT or GPT2), a new model of the same architecture is trained with the same training set but as targets, instead of using the original ones (in our case class probabilities), we use the predictions of the subensemble.
+
+Apparently, the model *learns better* when using these new targets than with the original ones, generating better predictions (it makes sense since these new targets were *naturally* output by that kind of model, thus, it is easier for them to *imitate/learn* from these predictions). In other words, the single model is being trained to directly generalize in the same way as the large model (subensemble) does.
+
+The predictions of a model trained this way are only slightly worse that those of the ensemble, but much better that those of a single model trained with the original targets. On the other hand, the inference time and computational resources used are greatly reduced compared with the ensemble (now it is just a single model). Therefore, this technique can be useful when an ensemble is being used but faster predictions or lighter models are needed, as it was the case in this Kaggle competition, or also, and more importantly, in a lot of production scenarios.
+
+#### Head+Tail Truncation
+
+The beginning and end of a text used to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, the maximum sequence length.  
+
+
 
 Kaggle Profile: https://www.kaggle.com/andrewparr
 
