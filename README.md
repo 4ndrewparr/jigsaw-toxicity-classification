@@ -216,11 +216,13 @@ Apparently, the model *learns better* when using these new targets than with the
 
 The predictions of a model trained this way are only slightly worse that those of the ensemble, but much better that those of a single model trained with the original targets. On the other hand, the inference time and computational resources used are greatly reduced compared with the ensemble (now it is just a single model). Therefore, this technique can be useful when an ensemble is being used but faster predictions or lighter models are needed, as it was the case in this Kaggle competition, or also, and more importantly, in a lot of production scenarios.
 
+You can read more about this technique in the original paper: [*Distilling the Knowledge in a Neural Network*](https://arxiv.org/abs/1503.02531) by G. Hinton.
+
 #### Head+Tail Truncation
 
 The beginning and end of a text used to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, or the maximum sequence length.  
 
-
+---
 
 Kaggle Profile: https://www.kaggle.com/andrewparr
 
