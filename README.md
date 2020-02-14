@@ -146,7 +146,9 @@ At inference time, LSTM loaded models (which include the embedding matrices) wil
 
 #### The Good Solution
 
-We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways. The advantage of this solution is that not having to rebuild the matrices saves some time, which is critical in the submission kernel.
+We can keep the old embedding matrix if we also use the old tokenizer. The tokenizer will be just not giving a token to new words that may appear in the test set, so the model will still work, but the information from these new words will be lost. Since the train set is considerably larger, there should not be too many new words anyways.
+
+The advantage of this solution is that not having to rebuild the matrices saves time, which can be important in the submission kernel.
 
 #### The Better Solution
 
