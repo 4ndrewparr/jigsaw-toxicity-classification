@@ -219,7 +219,7 @@ You can read more about this technique in the original paper: [*Distilling the K
 
 #### Head+Tail Truncation
 
-The beginning and end of a text used to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, or the maximum sequence length.  
+The beginning and end of a text use to contain more valuable information. Thus, if we have to truncate the text (for computational reasons, I used a maximum sequence length of around 220 tokens in my models), instead of cutting the end of it, taking the first 220 tokens, a more sensible approach is to select a combination of tokens from the start plus another from the end of the text that add to 220, or the maximum sequence length.  
 
 ---
 
